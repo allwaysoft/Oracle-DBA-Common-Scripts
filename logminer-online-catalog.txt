@@ -1,0 +1,146 @@
+
+1¡¢install LogMiner
+
+-bash-4.2$ sqlplus /nolog
+
+SQL*Plus: Release 11.2.0.4.0 Production on ÐÇÆÚ¶þ 8ÔÂ 27 21:50:31 2019
+
+Copyright (c) 1982, 2013, Oracle.  All rights reserved.
+
+SQL> conn / as sysdba
+Connected.
+SQL> @$ORACLE_HOME/rdbms/admin/dbmslm.sql
+
+Package created.
+
+
+Grant succeeded.
+
+
+Synonym created.
+
+SQL> @$ORACLE_HOME/rdbms/admin/dbmslmd.sql
+
+Package created.
+
+
+Synonym created.
+
+SQL>
+
+2¡¢add the redo log which needed the analysis
+
+BEGIN
+dbms_logmnr.add_logfile(
+		logfilename => '/data/oracle/archive/orcl/1_7_1016047951.dbf'
+	,	options=>dbms_logmnr.new
+	);
+END; 
+
+BEGIN
+	dbms_logmnr.add_logfile(
+		logfilename => '/data/oracle/archive/orcl/1_8_1016047951.dbf'
+	,	options=>dbms_logmnr.addfile
+	);
+END;
+
+BEGIN
+	dbms_logmnr.add_logfile(
+		logfilename => '/data/oracle/archive/orcl/1_9_1016047951.dbf'
+	,	options=>dbms_logmnr.addfile
+	);
+END;
+
+3¡¢use LogMiner to analyze the log
+
+BEGIN
+	DBMS_LOGMNR.START_LOGMNR(
+       	OPTIONS => SYS.DBMS_LOGMNR.DICT_FROM_ONLINE_CATALOG);
+END;
+
+ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS';
+SELECT *
+  FROM V$LOGMNR_CONTENTS order by 1;
+
+BEGIN
+	DBMS_LOGMNR.END_LOGMNR();
+END;
+
+
+-- 1. install LogMiner
+
+$ORACLE_HOME/rdbms/admin/dbmslm.sql
+$ORACLE_HOME/rdbms/admin/dbmslmd.sql
+
+@F:\app\Administrator\product\11.2.0\dbhome_1\RDBMS\ADMIN\dbmslm.sql
+@F:\app\Administrator\product\11.2.0\dbhome_1\RDBMS\ADMIN\dbmslmd.sql
+
+
+
+-- 2. create data dictionary file
+CREATE DIRECTORY utlfile AS 'F:\app\oracle\oradata\logmnr';
+ALTER SYSTEM SET utl_file_dir='F:\app\oracle\oradata\logmnr' SCOPE=SPFILE;
+
+
+BEGIN
+	dbms_logmnr_d.build(
+		dictionary_filename => 'dictionary.ora'
+	,	dictionary_location => 'F:\app\oracle\oradata\logmnr'
+	);
+END;
+/
+
+
+-- 3. add the redo log which needed the analysis
+
+SELECT group#, first_time, next_time FROM v$log;
+
+SELECT name, first_time, next_time FROM v$archived_log;
+
+BEGIN
+	dbms_logmnr.add_logfile(
+		logfilename => 'F:\app\oracle\oradata\informal\REDO01.LOG'
+	,	options=>dbms_logmnr.new
+	);
+END;
+/
+
+BEGIN
+	dbms_logmnr.add_logfile(
+		logfilename => 'F:\app\oracle\oradata\informal\REDO02.LOG'
+	,	options=>dbms_logmnr.addfile
+	);
+END;
+/
+
+BEGIN
+	dbms_logmnr.add_logfile(
+		logfilename => 'F:\app\oracle\oradata\informal\REDO03.LOG'
+	,	options=>dbms_logmnr.addfile
+	);
+END;
+/
+
+
+
+-- 4. use LogMiner to analyze the log
+
+BEGIN
+	dbms_logmnr.start_logmnr(
+		dictfilename => 'F:\app\oracle\oradata\logmnr\dictionary.ora'
+	,	startscn => 1239979
+	,	endscn => 1240628 
+	);
+END;
+/
+
+
+
+timestamp_to_scn(to_timestamp('2016-07-29 11:20:00','YYYY-MM-DD HH24:MI:SS'))
+
+
+
+
+select timestamp_to_scn(to_timestamp('2016-07-29 09:55:00','YYYY-MM-DD HH24:MI:SS')) from dual;
+select timestamp_to_scn(to_timestamp('2016-07-29 10:05:00','YYYY-MM-DD HH24:MI:SS')) from dual;
+
