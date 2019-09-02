@@ -1,0 +1,2 @@
+export NLS_DATE_FORMAT="yyyy-mm-dd hh24:mi:ss"
+

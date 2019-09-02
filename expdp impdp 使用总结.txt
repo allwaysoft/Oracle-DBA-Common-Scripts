@@ -1,0 +1,159 @@
+expdp impdp 使用总结
+1.     使用expdp要先在数据库中创建directory,并给相应的用户read,write权限. 
+
+SQL>create directory dmpdir as '/u01/dmdir';
+SQL>grant read,write on directory to test; 
+
+2.     最常用导出方法 
+
+$expdp scott/tiger DUMPFILE=scott.dmp DIRECTORY=dmpdir SCHEMAS=test 
+$expdp scott/tiger DUMPFILE=tmp_dump.dmp DIRECTORY=dmpdir TABLES=(tmp_test:p1,tmp_test:p2) JOB_NAME=tmp_dump LOGFILE=tmp_dump.log
+$expdp scott/tiger DUMPFILE=full.dmp DIRECTORY=dmpdir FULL=Y JOB_NAME=full 
+$expdp scott/timer DUMPFILE=tmp_200703.dmp DIRECTORY=dmpdir TABLES=tmp QUERY=\"where to_char\(create_time,\'yyyy-mm-dd\'\)\<\'2007-04\'\" 
+
+常用一些参数说明: 
+
+
+--------------------------------------------------------------------------------
+
+SCOTT/TIGER:用户/密码(*) 
+
+DUMPFILE:导出后的文件名(*) 
+
+DIRECTORY:导出文件存放位置(位于服务器端)(*) 
+
+CONTENT:导出文件中包含的内容(默认为:ALL,可选DATA_ONLY/METADATA_ONLY) 
+
+FILESIZE:指定导出文件大小(单位为bytes). 
+
+JOB_NAME:此次导出进程使用的名称,方便跟踪查询(可选) 
+
+LOGFILE:日志文件名(默认为:export.log) 
+
+
+--------------------------------------------------------------------------------
+
+INCLUDE:导出时包含指定的类型 
+
+(例:INCLUDE=TABLE_DATA, 
+
+INCLUDE=TABLE:"LIKE 'TAB%'" 
+
+INCLUDE=TABLE:”NOT LIKE ‘TAB%’”…) 
+
+EXCLUDE:导出时排除的数据类型(例:EXCLUDE=TABLE:EMP) 
+
+
+--------------------------------------------------------------------------------
+
+FULL:全库导出时使用(同EXP的FULL,默认为N) 
+
+SCHEMA:导出某一个SCHEMA下的所有数据 
+
+TABLES:按表导出(这里的方法和EXP一样) 
+
+TABLESPACE:指定一个表空间导出. 
+
+QUERY:按表导出时,使用条件语句限定导出范围(同exp中的QUERY) 
+
+
+--------------------------------------------------------------------------------
+
+TRANSPORT_FULL_CHECK: 
+
+TRANSPORT_TABLESPACES: 
+
+
+--------------------------------------------------------------------------------
+
+FLASHBACK_SCN: 
+
+FLASHBACK_TIME: 
+
+PARALLEL:并行操作 
+
+PARFILE: 
+
+NETWORK_LINK: 
+
+
+--------------------------------------------------------------------------------
+
+3.     导出过程中的监控 
+
+当 Data Pump Export (DPE) 运行时，按 Control-C；它将阻止消息在屏幕上显示，但不停止导出进程本身。相反，它将显示 DPE 提示符（如下所示）。进程现在被认为处于“交互式”模式： 
+
+Export> 
+
+这种方法允许在这个 DPE 作业上输入命令查询及控制当前作业。 
+
+4.     并行操作(PARALLEL) 
+
+您可以通过 PARALLEL 参数为导出使用一个以上的线程来显著地加速作业。每个线程创建一个单独的转储文件，因此参数 dumpfile 应当拥有和并行度一样多的项目。您可以指定通配符作为文件名，而不是显式地输入各个文件名，例如： 
+
+expdp ananda/abc123 tables=CASES directory=DPDATA1 dumpfile=expCASES_%U.dmp parallel=4 job_name=Cases_Export 
+
+注意:dumpfile 参数拥有一个通配符 %U，它指示文件将按需要创建，格式将为expCASES_nn.dmp，其中nn 从 01 开始，然后按需要向上增加。 
+
+在并行模式下，状态屏幕将显示四个工作进程。（在默认模式下，只有一个进程是可见的）所有的工作进程同步取出数据，并在状态屏幕上显示它们的进度。 
+
+分离访问数据文件和转储目录文件系统的输入/输出通道是很重要的。否则，与维护 Data Pump 作业相关的开销可能超过并行线程的效益，并因此而降低性能。并行方式只有在表的数量多于并行值并且表很大时才是有效的。 
+
+5.     数据库监控 
+
+您还可以从数据库视图获得关于运行的 Data Pump 作业的更多信息。监控作业的主视图是 DBA_DATAPUMP_JOBS，它将告诉您在作业上有多少个工作进程（列 DEGREE）在工作。 
+
+另一个重要的视图是 DBA_DATAPUMP_SESSIONS，当它与上述视图和 V$SESSION 结合时将给出主前台进程的会话 SID。 
+
+select sid, serial#
+from v$session s, dba_datapump_sessions d
+where s.saddr = d.saddr; 
+
+这条指令显示前台进程的会话。更多有用的信息可以从警报日志中获得。当进程启动时，MCP 和工作进程在警报日志中显示如下： 
+
+kupprdp:master process DM00 started with pid=23, OS id=20530 to execute - 
+SYS.KUPM$MCP.MAIN('CASES_EXPORT', 'ANANDA');
+kupprdp:worker process DW01 started with worker id=1, pid=24, OS id=20532 to execute - 
+SYS.KUPW$WORKER.MAIN('CASES_EXPORT', 'ANANDA');
+kupprdp:worker process DW03 started with worker id=2, pid=25, OS id=20534 to execute - 
+SYS.KUPW$WORKER.MAIN('CASES_EXPORT', 'ANANDA'); 
+
+它显示为数据泵操作启动的会话的 PID。您可以用以下查询找到实际的 SID： 
+
+select sid, program from v$session where paddr in 
+(select addr from v$process where pid in (23,24,25)); 
+
+PROGRAM 列将对应警报日志文件中的名称显示进程 DM （为主进程）或 DW （为工作进程）。如果一个工作进程使用了并行查询，比如说 SID 23，您可以在视图 V$PX_SESSION 中看到它，并把它找出来。它将为您显示从 SID 23 代表的工作进程中运行的所有并行查询会话： 
+
+select sid from v$px_session where qcsid = 23; 
+
+从视图 V$SESSION_LONGOPS 中可以获得其它的有用信息来预测完成作业将花费的时间。 
+
+select sid, serial#, sofar, totalwork
+from v$session_longops
+where opname = 'CASES_EXPORT'
+and sofar != totalwork; 
+
+列 totalwork 显示总工作量，该列的 sofar 数量被加和到当前的时刻 — 因而您可以用它来估计还要花多长时间。 
+
+6.       处理特定对象 
+
+l         Data Pump 允许您只导出特定类型的对象。 
+
+例如，以下命令只导出过程，而不导出其它任何东西(不导出表、视图、甚至函数)： 
+
+expdp scott/tiger directory=dmpdir dumpfile=procedure.dmp include=PROCEDURE 
+
+l         要只导出一些特定的对象(比如说，函数 FUNC1 和过程 PROC1) 
+
+expdp scott/tiger directory=dmpdir dumpfile=test.dmp 
+include=PROCEDURE:\"=\'PROC1\'\",FUNCTION:\"=\'FUNC1\'\" 
+
+l         可以用导出的dmp文件来创建dmp文件中包含对象的 DDL 脚本，以供之后使用。 
+
+一个称为 SQLFILE(impdp参数)参数允许创建 DDL 脚本文件。 
+
+impdp scott/tiger DIRECTORY=dmpdir DUMPFILE=expprocs.dmp SQLFILE=aa.sql 
+
+使用这种方法的impdp,可以从dp出来的dmp文件中提取对象的DDL语句,这样的impdp并不把数据导入数据库中,只是创建DDL语句文件
+

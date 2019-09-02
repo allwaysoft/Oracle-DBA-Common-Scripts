@@ -1,0 +1,1 @@
+select name,text from all_source where type='TRIGGER' AND text like '%s%'

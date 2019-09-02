@@ -1,0 +1,9 @@
+SQL> alter session set nls_date_format = 'DD-MON-YYYY hh24:mi:ss';
+
+SQL> select sysdate from dual;
+
+SYSDATE
+--------------------
+15-FEB-2012 16:10:30
+
+SQL>

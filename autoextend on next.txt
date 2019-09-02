@@ -1,0 +1,18 @@
+
+SQL> select FILE_ID from dba_data_files;
+
+   FILE_ID
+----------
+         4
+         2
+         3
+         1
+alter database datafile 1 autoextend on next 100m maxsize unlimited;
+alter database datafile 2 autoextend on next 100m maxsize unlimited;
+alter database datafile 3 autoextend on next 100m maxsize unlimited;
+alter database datafile 4 autoextend on next 100m maxsize unlimited;
+alter database datafile 5 autoextend on next 100m maxsize unlimited;
+
+select FILE_ID from dba_temp_files;
+alter database tempfile 1 autoextend on next 100m maxsize unlimited;
+
