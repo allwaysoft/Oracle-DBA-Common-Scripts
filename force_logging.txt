@@ -1,0 +1,18 @@
+ALTER DATABASE [NO] FORCE LOGGING
+
+Use this clause to put the database into or take the database out of FORCE LOGGING mode. The database must be mounted or open.
+
+In FORCE LOGGING mode, Oracle Database logs all changes in the database except changes in temporary tablespaces and temporary segments. This setting takes precedence over and is independent of any NOLOGGING or FORCE LOGGING settings you specify for individual tablespaces and any NOLOGGING settings you specify for individual database objects.
+
+If you specify FORCE LOGGING, then Oracle Database waits for all ongoing unlogged operations to finish.
+
+See Also:
+
+Oracle Database Administrator's Guide for information on when to use FORCE LOGGING mode
+
+
+select log_mode,force_logging from v$database;
+select tablespace_name,logging,force_logging from dba_tablespaces;
+select table_name,logging from user_tables;
+ALTER TABLESPACE users FORCE LOGGING;
+ALTER DATABASE FORCE LOGGING;
