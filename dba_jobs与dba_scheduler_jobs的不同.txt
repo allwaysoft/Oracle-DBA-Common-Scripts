@@ -1,0 +1,316 @@
+dba_jobs与dba_scheduler_jobs的不同
+DBMS_JOB和DBMS_SCHEDULER都是Oracle提供的程序包，都可以用来创建、管理job，其中DBMS_SCHEDULER的功能更为强大。先解释scheduler的基础概念，scheduler 包含了以下几个实体对象： 
+Program -- 提供了scheduler 将要运行什么，包含program name，program type(PL/SQ块、存储过程、外部程序)，program action(具体的程序实体，比如说一个PL/SQL块、或者是存储过程的名称、或者是外部程序的路径加名称) 。 
+Schedules -- 指定何时何种频率来运行job，可以被不同的job重复的利用。比如说我有两个job都要求在每天的凌晨4点运行，那么两个job可以同时指定相同的schedule。 
+Jobs -- 具体的作业的名称，依赖于那个program、schedule。也可以不指定program、schedule，而直接写入program、schedule的相应参数。
+另外，需要注意的是，通过DBMS_JOB和DBMS_SCHEDULER创建的job信息存储在不同的数据字典中，其中，通过DBMS_JOB创建的job信息存储在user_jobs，而通过DBMS_SCHEDULER创建的job信息存储在user_scheduler_jobs中。
+
+下面，分别使用DBMS_JOB和DBMS_SCHEDULER来创建job。
+
+使用DBMS_JOB
+1.创建测试表
+
+
+
+SQL> create table test(h1 date); 
+ 
+Table created
+ 
+SQL>
+2.创建存储过程，向test表中插入一条数据
+
+PL/SQL:
+create or replace procedure pro_test is
+begin
+insert into test values(sysdate);
+COMMIT;
+end pro_test;
+
+
+SQLPLUS:
+SQL> 
+SQL> create or replace procedure pro_test is
+begin
+insert into test values(sysdate);
+COMMIT;
+end pro_test;
+/
+ 
+Procedure created
+ 
+SQL>
+3.创建job
+
+PL/SQL:
+DECLARE
+job1 NUMBER;
+begin
+dbms_job.submit(job1,'pro_test;',sysdate,'sysdate+1/1440');--每天1440分钟，即一分钟运行test过程一次
+end;
+
+
+
+
+
+SQLPLUS:
+SQL> 
+SQL> variable job1 number
+SQL> begin
+dbms_job.submit(:job1,'pro_test;',sysdate,'sysdate+1/1440');--每天1440分钟，即一分钟运行test过程一次
+end;
+/
+
+
+
+SQL> 
+SQL> variable job1 number
+SQL> begin
+dbms_job.submit(:job1,\'pro_test;\',sysdate,\'sysdate+1/1440\');--每天1440分钟，即一分钟运行test过程一次
+end;
+/
+ 
+PL/SQL procedure successfully completed
+job1
+---------
+ 
+SQL>
+4.执行job
+
+
+
+SQL> 
+SQL> begin
+dbms_job.run(:job1);
+end;
+/
+ 
+PL/SQL procedure successfully completed
+job1
+---------
+ 
+SQL>
+两分钟后，查询测试表，确认job是否正常执行
+
+
+
+SQL> select to_char(h1,\'yyyy-mm-dd HH24:mi:ss\') H1 from test;
+ 
+H1
+-------------------
+2015-04-28 16:08:23
+2015-04-28 16:07:21
+ 
+SQL>
+
+5.停止job
+
+
+
+SQL> 
+SQL> begin
+dbms_job.broken(1,true);
+end;
+/
+ 
+PL/SQL procedure successfully completed
+ 
+SQL>
+其中，1是创建job是定义的变量值，可以唯一标识一个job
+6.启用job
+
+
+
+SQL> 
+SQL> begin
+dbms_job.broken(1,false);
+end;
+/
+ 
+PL/SQL procedure successfully completed
+ 
+SQL>
+7.删除job
+
+
+
+SQL> 
+SQL> begin
+dbms_job.remove(1);
+end;
+/
+ 
+PL/SQL procedure successfully completed
+ 
+SQL>
+
+使用DBMS_SCHEDULER
+1.创建测试表
+
+
+
+SQL> create table test(h1 date); 
+ 
+Table created
+ 
+SQL>
+2.创建存储过程，向test表中插入一条数据
+
+
+
+SQL> 
+SQL> create or replace procedure pro_test is
+begin
+insert into test values(sysdate);
+COMMIT;
+end pro_test;
+/
+ 
+Procedure created
+ 
+SQL>
+3.创建schedule
+在schedule中定义了schedule名称、起止时间、调用间隔等参数。
+
+
+SQL> 
+SQL> begin
+-- create_schedule
+dbms_scheduler.create_schedule(schedule_name => \'schedule_test\',
+start_date => \'28-4月 -15 4.30.00.000 下午\',
+repeat_interval => \'FREQ=MINUTELY; INTERVAL=1\',
+end_date => \'29-4月 -15 4.30.00.000 下午\',
+comments => \'TEST schedule\');
+end;
+/
+ 
+PL/SQL procedure successfully completed
+ 
+SQL>
+4.创建program
+在program中定义了程序的类型、具体操作、参数个数等参数
+
+
+SQL> 
+SQL> begin
+-- create_program
+dbms_scheduler.create_program(program_name => \'program_test\',
+program_type => \'PLSQL_BLOCK\',
+program_action => \'BEGIN PRO_TEST; END;\',
+number_of_arguments => 0,
+enabled => TRUE,
+comments => \'TEST program\');
+end;
+/
+ 
+PL/SQL procedure successfully completed
+ 
+SQL>
+
+5.创建job
+在job中指定了job_name，以及相关联的program_name、schedule_name等参数。
+
+
+SQL> 
+SQL> begin
+-- create_job
+dbms_scheduler.create_job(job_name => \'job_test\',
+program_name => \'program_test\',
+schedule_name => \'schedule_test\',
+job_class => \'DEFAULT_JOB_CLASS\',
+enabled => true,
+auto_drop => true,
+comments => \'TEST procedure\');
+end;
+/
+ 
+PL/SQL procedure successfully completed
+ 
+SQL>
+6.执行job
+
+
+
+SQL> 
+SQL> begin
+-- Call the procedure
+dbms_scheduler.run_job(job_name => \'job_test\',
+use_current_session => false);
+end;
+/
+ 
+PL/SQL procedure successfully completed
+ 
+SQL>
+几分钟后，查询测试表，确认job是否正常执行
+
+
+
+SQL> select to_char(h1,\'yyyy-mm-dd HH24:mi:ss\') H1 from test;
+ 
+H1
+-------------------
+2015-04-28 16:30:00
+2015-04-28 16:31:00
+2015-04-28 16:32:00
+2015-04-28 16:24:25
+ 
+SQL>
+7.禁用job
+
+
+
+SQL> 
+SQL> begin
+dbms_scheduler.disable(\'job_test\');
+end;
+/
+ 
+PL/SQL procedure successfully completed
+ 
+SQL> 
+SQL> select job_name,enabled,state from user_scheduler_jobs;
+ 
+JOB_NAME ENABLED STATE
+------------------------------ ------- ---------------
+JOB_TEST FALSE DISABLED
+ 
+SQL>
+8.启用job
+
+
+
+SQL> 
+SQL> begin
+dbms_scheduler.enable(\'job_test\');
+end;
+/
+ 
+PL/SQL procedure successfully completed
+ 
+SQL> 
+SQL> select job_name,enabled,state from user_scheduler_jobs;
+ 
+JOB_NAME ENABLED STATE
+------------------------------ ------- ---------------
+JOB_TEST TRUE SCHEDULED
+ 
+SQL>
+9.删除job
+
+
+
+SQL> 
+SQL> begin
+dbms_scheduler.drop_job(\'job_test\');
+end;
+/
+ 
+PL/SQL procedure successfully completed
+ 
+SQL> 
+SQL> select job_name,enabled,state from user_scheduler_jobs;
+ 
+JOB_NAME ENABLED STATE
+------------------------------ ------- ---------------
+ 
+SQL>
