@@ -1,0 +1,110 @@
+查询ORACLE RAC数据库联机日志信息
+
+SELECT
+    a.GROUP#,
+    a.THREAD#,
+    a.SEQUENCE#,
+    a.ARCHIVED,
+    a.STATUS,
+    b.MEMBER    AS REDOLOG_FILE_NAME,
+    (a.BYTES/1024/1024) AS SIZE_MB
+FROM v$log a
+JOIN v$logfile b ON a.Group#=b.Group# 
+ORDER BY a.GROUP# ASC;
+
+
+
+
+    GROUP#    THREAD#  SEQUENCE# ARC STATUS          
+---------- ---------- ---------- --- ----------------
+REDOLOG_FILE_NAME                                                               
+--------------------------------------------------------------------------------
+   SIZE_MB
+----------
+         1          1      25433 YES INACTIVE        
++FRA/orcl/onlinelog/group_1.262.991754521                                       
+       100
+                                                                                
+         1          1      25433 YES INACTIVE        
++DATA/orcl/onlinelog/group_1.268.991754521                                      
+       100
+                                                                                
+         2          1      25434 YES INACTIVE        
++DATA/orcl/onlinelog/group_2.269.991754521                                      
+       100
+                                                                                
+         2          1      25434 YES INACTIVE        
++FRA/orcl/onlinelog/group_2.263.991754521                                       
+       100
+                                                                                
+         3          2      43789 NO  CURRENT         
+
+    GROUP#    THREAD#  SEQUENCE# ARC STATUS          
+---------- ---------- ---------- --- ----------------
+REDOLOG_FILE_NAME                                                               
+--------------------------------------------------------------------------------
+   SIZE_MB
+----------
++DATA/orcl/onlinelog/group_3.278.991756107                                      
+       100
+                                                                                
+         3          2      43789 NO  CURRENT         
++FRA/orcl/onlinelog/group_3.266.991756107                                       
+       100
+                                                                                
+         4          2      43787 YES INACTIVE        
++DATA/orcl/onlinelog/group_4.279.991756109                                      
+       100
+                                                                                
+         4          2      43787 YES INACTIVE        
++FRA/orcl/onlinelog/group_4.267.991756109                                       
+       100
+                                                                                
+         5          1      25435 YES INACTIVE        
++FRA/orcl/onlinelog/group_5.264.991754521                                       
+
+    GROUP#    THREAD#  SEQUENCE# ARC STATUS          
+---------- ---------- ---------- --- ----------------
+REDOLOG_FILE_NAME                                                               
+--------------------------------------------------------------------------------
+   SIZE_MB
+----------
+       100
+                                                                                
+         5          1      25435 YES INACTIVE        
++DATA/orcl/onlinelog/group_5.270.991754521                                      
+       100
+                                                                                
+         6          1      25432 YES INACTIVE        
++DATA/orcl/onlinelog/group_6.271.991754521                                      
+       100
+                                                                                
+         6          1      25432 YES INACTIVE        
++FRA/orcl/onlinelog/group_6.265.991754523                                       
+       100
+                                                                                
+         7          2      43786 YES INACTIVE        
++DATA/orcl/onlinelog/group_7.280.991756109                                      
+       100
+
+    GROUP#    THREAD#  SEQUENCE# ARC STATUS          
+---------- ---------- ---------- --- ----------------
+REDOLOG_FILE_NAME                                                               
+--------------------------------------------------------------------------------
+   SIZE_MB
+----------
+                                                                                
+         7          2      43786 YES INACTIVE        
++FRA/orcl/onlinelog/group_7.268.991756109                                       
+       100
+                                                                                
+         8          2      43788 YES INACTIVE        
++DATA/orcl/onlinelog/group_8.281.991756109                                      
+       100
+                                                                                
+         8          2      43788 YES INACTIVE        
++FRA/orcl/onlinelog/group_8.269.991756109                                       
+       100
+                                                                                
+
+16 rows selected.
