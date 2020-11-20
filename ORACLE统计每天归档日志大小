@@ -1,0 +1,97 @@
+ORACLE统计每天归档日志大小：
+  SELECT   TRUNC (COMPLETION_TIME) ARCHIVED_DATE,
+           ROUND (SUM (BLOCKS * BLOCK_SIZE) / 1024 / 1024, 0) SIZE_IN_MB
+    FROM   V$ARCHIVED_LOG
+GROUP BY   TRUNC (COMPLETION_TIME)
+ORDER BY   1;
+
+
+
+ARCHIVED_ SIZE_IN_MB
+--------- ----------
+04-十一月       4585
+-19                 
+                                                                                
+05-十一月       1360
+-19                 
+                                                                                
+06-十一月       1248
+-19                 
+                                                                                
+07-十一月       1270
+-19                 
+                                                                                
+08-十一月       1041
+-19                 
+                                                                                
+09-十一月       1238
+-19                 
+                                                                                
+10-十一月       1406
+-19                 
+                                                                                
+
+ORACLE统计每小时归档日志大小：
+
+  SELECT   TRUNC (COMPLETION_TIME, 'HH') ARCHIVED_DATE_HOUR,
+           ROUND (SUM (BLOCKS * BLOCK_SIZE) / 1024 / 1024, 0) SIZE_IN_MB
+    FROM   V$ARCHIVED_LOG
+GROUP BY   TRUNC (COMPLETION_TIME, 'HH')
+ORDER BY   1;
+
+
+ARCHIVED_ SIZE_IN_MB
+--------- ----------
+04-十一月        204
+-19                 
+                                                                                
+04-十一月        238
+-19                 
+                                                                                
+04-十一月        252
+-19                 
+                                                                                
+04-十一月        243
+-19                 
+                                                                                
+04-十一月        251
+-19                 
+                                                                                
+04-十一月        244
+-19                 
+                                                                                
+04-十一月        248
+-19  
+
+ORACLE RAC按实例统计每天归档日志大小：
+
+  SELECT   TRUNC (COMPLETION_TIME) ARCHIVED_DATE,
+           THREAD#,
+           ROUND (SUM (BLOCKS * BLOCK_SIZE) / 1024 / 1024, 0) SIZE_IN_MB
+    FROM   V$ARCHIVED_LOG
+GROUP BY   TRUNC (COMPLETION_TIME), THREAD#
+ORDER BY   1, 2
+
+
+ARCHIVED_    THREAD# SIZE_IN_MB
+--------- ---------- ----------
+04-十一月          1       2485
+-19                            
+                                                                                
+04-十一月          2       2100
+-19                            
+                                                                                
+05-十一月          1        651
+-19                            
+                                                                                
+05-十一月          2        709
+-19                            
+                                                                                
+06-十一月          1        556
+-19                            
+                                                                                
+06-十一月          2        692
+-19                            
+                                                                                
+07-十一月          1        719
+-19  
