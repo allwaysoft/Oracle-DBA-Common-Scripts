@@ -1,0 +1,1 @@
+select username from  dba_users where username not in(select GRANTEE from dba_sys_privs where PRIVILEGE ='UNLIMITED TABLESPACE')
