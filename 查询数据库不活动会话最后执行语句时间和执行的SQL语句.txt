@@ -1,0 +1,1 @@
+select username,sid,status,to_char(sysdate-S.LAST_CALL_ET/24/60/60,'yyyy-mm-dd HH24:MI:SS'),sql_text from v$session s,v$sql q where s.username='SOMEUSERNAME' and S.PREV_SQL_ID=Q.SQL_ID order by S.LAST_CALL_ET desc
