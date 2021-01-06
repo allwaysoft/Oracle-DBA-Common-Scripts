@@ -1,0 +1,45 @@
+检查Oracle数据库和PDB数据库的大小
+
+NON-CDB数据库的以下查询：
+
+检查磁盘上数据库消耗的物理消耗量。
+
+select sum(bytes)/1024/1024 size_in_mb from dba_data_files;
+
+检查数据使用的总空间。
+
+select sum(bytes)/1024/1024 size_in_mb from dba_segments;
+
+在Oracle中检查用户或模式的大小。
+
+select owner, sum(bytes)/1024/1024 Size_MB from dba_segments group by owner;
+
+检查数据库中的可用空间和已用空间。
+
+select
+"Reserved_Space(MB)", "Reserved_Space(MB)" - "Free_Space(MB)" "Used_Space(MB)","Free_Space(MB)"
+from(
+select
+(select sum(bytes/(1014*1024)) from dba_data_files) "Reserved_Space(MB)",
+(select sum(bytes/(1024*1024)) from dba_free_space) "Free_Space(MB)"
+from dual );
+
+检查数据库，临时文件和重做文件的整体大小。
+
+select
+( select sum(bytes)/1024/1024/1024 data_size from dba_data_files ) +
+( select nvl(sum(bytes),0)/1024/1024/1024 temp_size from dba_temp_files ) +
+( select sum(bytes)/1024/1024/1024 redo_size from sys.v_$log ) +
+( select sum(BLOCK_SIZE*FILE_SIZE_BLKS)/1024/1024/1024 controlfile_size from v$controlfile) "Size in GB"
+from
+dual;
+
+跟踪CDB和PDB数据库的查询
+
+检查数据库的PDB大小
+
+select con_id, name, open_mode, total_size from v$pdbs;
+
+检查数据库的CDB大小
+
+select sum(size)/1024/1024/1024 from cdb_data_files;
