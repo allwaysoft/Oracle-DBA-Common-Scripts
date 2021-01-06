@@ -1,0 +1,1 @@
+SELECT segment_type ObjectType, COUNT(*) NumberofObjects, ROUND(SUM (bytes / 1024 / 1024),2) ObjectSizeinMB FROM dba_segments GROUP BY segment_type ORDER BY segment_type

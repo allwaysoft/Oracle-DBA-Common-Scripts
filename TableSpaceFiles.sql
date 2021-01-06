@@ -1,0 +1,1 @@
+select tablespace_name as Tablespace,  file_name as FileName, round(bytes/1024/1024,1) as SizeMb,  round(maxbytes/1024/1024,1) as MaxSizeMb, autoextensible as AutoExentsible from dba_data_files order by Tablespace, FileName

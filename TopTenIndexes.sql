@@ -1,0 +1,1 @@
+SELECT owner , segment_name  as IndexName, segment_type, bytes/1024/1024  as  SizeinMeg FROM ( SELECT owner, segment_name, segment_type, bytes FROM dba_segments WHERE segment_type like 'INDEX%'  ORDER BY bytes DESC )WHERE rownum < 11

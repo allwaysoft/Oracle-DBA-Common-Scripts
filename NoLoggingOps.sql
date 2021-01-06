@@ -1,0 +1,1 @@
+SELECT t.name AS ts_name,d.name AS dbf_name, d.unrecoverable_change# AS nolog_chng,TO_CHAR (d.unrecoverable_time, 'Dy DD-Mon-YYYY HH24:MI:SS')AS nolog_time,db.force_logging   FROM v$datafile d, v$tablespace t, v$database db  WHERE d.ts# = t.ts# AND db.force_logging = 'YES' ORDER BY 1, 2

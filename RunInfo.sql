@@ -1,0 +1,1 @@
+SELECT name as Database, instance_name as Instance,to_char(SYSDATE,'YYYY-MM-DD/HH24:MI:SS')as Run_Time, host_name  as Hostname,  USER  as Run_User FROM v$database, v$instance

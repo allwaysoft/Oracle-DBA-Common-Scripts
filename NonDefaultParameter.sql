@@ -1,0 +1,1 @@
+SELECT name,value FROM v$parameter WHERE ISDEFAULT ='FALSE' ORDER BY name ASC

@@ -1,0 +1,1 @@
+SELECT f.file# FilePath,d.name FileName,phyrds Phys_Reads,CASE WHEN phyrds = 0 THEN 0 ELSE round(readtim / phyrds,3) END Avg_ReadTime,phywrts Phys_Writes,CASE WHEN phywrts = 0 THEN 0 ELSE round(writetim / phywrts,3) END Avg_WriteTime FROM v$filestat f, v$datafile d WHERE f.file# = d.file# ORDER BY phywrts DESC

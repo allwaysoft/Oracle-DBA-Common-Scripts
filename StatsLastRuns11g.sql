@@ -1,0 +1,1 @@
+SELECT ac.client_name as Job , ah.job_status as Last_Job_Status, ah.job_start_time as Start_Time, to_char(ah.job_duration) as Duration FROM dba_autotask_client ac,DBA_AUTOTASK_JOB_HISTORY ah WHERE ac.client_name = 'auto optimizer stats collection'  AND ah.client_name  =  ac.client_name  AND TRUNC (job_start_time) >= TRUNC (SYSDATE) - 7 ORDER BY ah.job_start_time desc

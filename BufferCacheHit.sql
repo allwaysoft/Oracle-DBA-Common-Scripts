@@ -1,0 +1,1 @@
+SELECT TO_CHAR (NVL ( (a.VALUE - b.VALUE + c.VALUE) * 100 / (a.VALUE), 0),'99.90') as Buffer_Cache_Hit_Rate FROM v$sysstat a, v$sysstat b, v$sysstat c WHERE    a.name = 'session logical reads' AND b.name = 'physical reads' AND c.name = 'physical reads direct'

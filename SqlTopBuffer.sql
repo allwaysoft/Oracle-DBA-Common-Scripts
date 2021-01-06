@@ -1,0 +1,2 @@
+SELECT *  FROM (  SELECT sql_id  as SQL_ID,last_load_time as Last_Load,last_active_time as Last_Active, sorts as Sorts,loaded_versions as Load_Version,open_versions as 
+Open_Version,users_opening as User_Opening ,fetches as Fetches,executions as Execs,disk_reads as Disk_Read,buffer_gets as Buffer_Gets FROM v$sql ORDER BY buffer_gets DESC) a WHERE ROWNUM < 11

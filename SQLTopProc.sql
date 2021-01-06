@@ -1,0 +1,1 @@
+Select * from (  SELECT ptyp as Object_Type, obj as Object_Name, 0 - exem as Number_of_Executions   FROM (SELECT DISTINCT exem, ptyp, obj FROM (SELECT o.TYPE ptyp, o.owner || '.' || o.name obj, 0 - o.executions exem  FROM v$db_object_cache o  WHERE o.TYPE IN ('FUNCTION', 'PACKAGE', 'PACKAGE BODY',  'PROCEDURE', 'TRIGGER')))ORDER BY 0 - exem DESC) WHERE ROWNUM < 11

@@ -1,0 +1,1 @@
+SELECT value AS SpfileLocation FROM v$parameter WHERE name = 'spfile' AND VALUE IS NOT NULL

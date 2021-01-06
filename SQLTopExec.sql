@@ -1,0 +1,1 @@
+SELECT * FROM(SELECT sql_id as SQLID,last_load_time as LastLoad,to_char(last_active_time,'YYYY-MM-DD/HH24:MI:SS') as LastActive,sorts as Sorts, loaded_versions as LoadVersion,open_versions as OpenVersion,users_opening as UserOpening,fetches as Fetches,executions as Execs,disk_reads as DiskRead,buffer_gets as BufferGets FROM v$sql ORDER BY executions DESC) a WHERE ROWNUM < 1

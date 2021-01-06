@@ -1,0 +1,1 @@
+SELECT User,default_tablespace as Default_Tablespace,temporary_tablespace as Temporary_Tablespace FROM dba_users  WHERE (default_tablespace = 'SYSTEM' OR temporary_tablespace = 'SYSTEM') ORDER BY username

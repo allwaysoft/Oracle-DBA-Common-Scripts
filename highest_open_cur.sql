@@ -1,0 +1,1 @@
+SELECT SUM (a.VALUE) AS highest_open_cur FROM v$sesstat a, v$statname b WHERE a.statistic# = b.statistic# AND b.name = 'opened cursors current'

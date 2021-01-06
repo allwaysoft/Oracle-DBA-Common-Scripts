@@ -1,0 +1,1 @@
+SELECT username, sysdba, sysoper FROM v$pwfile_users

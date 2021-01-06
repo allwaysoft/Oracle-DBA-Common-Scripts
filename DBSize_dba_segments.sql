@@ -1,0 +1,1 @@
+SELECT TO_CHAR (ROUND (SUM (bytes / 1024 / 1024 / 1024), 1), '999,999,999.0') DBSizeInGB FROM dba_segments

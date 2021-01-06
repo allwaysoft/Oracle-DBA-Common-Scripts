@@ -1,0 +1,1 @@
+SELECT vbd.file# as File#, MAX (vbd.checkpoint_change#) as Chkpt_SCN, to_char(MAX (vbd.checkpoint_time),'YYYY-MM-DD/HH24:MI:SS') as Chkpt_Time,vd.name as Data_File FROM v$backup_datafile vbd, v$datafile vd WHERE vbd.file# = vd.file# GROUP BY vbd.file#, vd.name ORDER BY MAX (vbd.checkpoint_time), vbd.file#

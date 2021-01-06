@@ -1,0 +1,1 @@
+SELECT VALUE AS current_logon_count FROM v$sysstat WHERE name = 'logons current'

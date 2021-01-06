@@ -1,0 +1,1 @@
+select NAME,SPACE_LIMIT, SPACE_USED, SPACE_RECLAIMABLE, NUMBER_OF_FILES from v$recovery_file_dest

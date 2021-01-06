@@ -1,0 +1,1 @@
+SELECT owner as Owner, segment_name as TableName, segment_type as Type, bytes / 1024 / 1024 as Size_in_Mb FROM ( SELECT owner,  segment_name, segment_type, bytes FROM dba_segments WHERE segment_type LIKE 'TABLE%' ORDER BY bytes DESC) WHERE ROWNUM < 11

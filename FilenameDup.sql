@@ -1,0 +1,1 @@
+SELECT file_name as FileName, COUNT (*) as DuplicateCount FROM (SELECT SUBSTR (file_name, INSTR (file_name, '/', -1) + 1) file_name FROM dba_data_files UNION ALL SELECT SUBSTR (file_name, INSTR (file_name, '/', -1) + 1) file_name FROM dba_temp_files) GROUP BY file_name  HAVING COUNT (*) > 1 ORDER BY 1

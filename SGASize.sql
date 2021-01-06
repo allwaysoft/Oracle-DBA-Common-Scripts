@@ -1,0 +1,1 @@
+SELECT name as Name,ROUND(VALUE / 1024 / 1024,2) as Size_in_MB FROM v$sga ORDER BY name

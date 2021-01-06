@@ -1,0 +1,1 @@
+SELECT  i.instance_number,i.instance_name,v.banner FROM gv$instance i,gv$version v WHERE i.inst_id = v.inst_id ORDER BY 1,2

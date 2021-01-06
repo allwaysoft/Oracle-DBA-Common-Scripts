@@ -1,0 +1,1 @@
+SELECT owner, index_name, status FROM dba_indexes WHERE status = 'UNUSABLE' ORDER BY owner, index_name

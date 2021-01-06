@@ -1,0 +1,1 @@
+SELECT start_time as Start_Time,end_time as End_Time,input_type as Type,status as Status FROM V$RMAN_BACKUP_JOB_DETAILS   WHERE start_time >= TRUNC (SYSDATE - 14)ORDER BY start_time DESC

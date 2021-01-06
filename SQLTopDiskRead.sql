@@ -1,0 +1,1 @@
+SELECT * FROM (  SELECT hash_value as Hash_Value, last_load_time as Last_Load, sorts as Sorts,loaded_versions as Load_Version,open_versions as Open_Version, users_opening as User_Opening , fetches as Fetches, executions as Execs,disk_reads as Disk_Read, buffer_gets as Buffer_Gets FROM v$sql ORDER BY disk_reads DESC) a WHERE ROWNUM < 11

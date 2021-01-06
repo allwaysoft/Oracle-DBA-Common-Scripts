@@ -1,0 +1,1 @@
+SELECT component AS SgaComponent,ROUND (current_size / 1024 / 1024, 2) AS CurrentMb,ROUND (min_size / 1024 / 1024, 2) AS MinMb,ROUND (max_size / 1024 / 1024, 2) AS MaxMb,last_oper_type AS LastOperation FROM v$sga_dynamic_components ORDER BY component

@@ -1,0 +1,1 @@
+SELECT * FROM v$waitstat WHERE COUNT > 0 OR time > 0 ORDER BY time DESC

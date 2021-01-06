@@ -1,0 +1,1 @@
+SELECT name, state, total_mb, free_mb, offline_disks, compatibility, database_compatibility FROM v$asm_diskgroup ORDER BY name

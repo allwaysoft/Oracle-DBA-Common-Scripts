@@ -1,0 +1,1 @@
+SELECT group# as GroupName,status as Status,member as FileName,is_recovery_dest_file as RecoveryDestFile FROM v$logfile order by group#, member

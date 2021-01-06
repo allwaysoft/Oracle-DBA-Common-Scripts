@@ -1,0 +1,1 @@
+SELECT TO_CHAR (TRUNC (firsttime),'YYYY/MM/DD - DY') AS FirstDate, SUM (cnt) AS TotalSwitches,ROUND (SUM (cnt) / 24, 1) AS AvgHourSwitches, MAX (cnt) AS MaxHourCnt  FROM (SELECT TRUNC (first_time, 'HH24') firsttime, COUNT (*) cnt FROM v$log_history WHERE first_time > SYSDATE - 30 GROUP BY TRUNC (first_time, 'HH24'))GROUP BY TRUNC (firsttime) ORDER BY 1

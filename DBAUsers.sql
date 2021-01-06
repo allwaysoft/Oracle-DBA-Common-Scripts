@@ -1,0 +1,1 @@
+SELECT grantee FROM (SELECT DISTINCT grantee FROM dba_role_privs WHERE grantee NOT IN ('SYSTEM', 'SYS', 'SYSMAN') START WITH granted_role = 'DBA' CONNECT BY PRIOR grantee = granted_role MINUS SELECT role FROM dba_roles) ORDER BY 1
